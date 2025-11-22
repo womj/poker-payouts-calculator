@@ -8,16 +8,8 @@
   </head>
   <body>
     <div class="container">
-      <header>
-        <h1>💰 Poker Payouts Calculator</h1>
-        <p class="subtitle">
-          Track buy-ins and cash-outs to calculate settlements
-        </p>
-      </header>
-
       <main>
         <section class="input-section">
-          <h2>Players</h2>
           <div class="column-headers">
             <div>Name</div>
             <div>Buy-in ($)</div>
@@ -32,12 +24,7 @@
         </section>
 
         <section class="results-section">
-          <div class="results-header">
-            <h2>Payment Instructions</h2>
-            <button id="calculate-btn" class="btn btn-success">
-              Calculate Payouts
-            </button>
-          </div>
+          <button id="calculate-btn" class="btn btn-primary">Calculate</button>
           <div id="results"></div>
         </section>
 
@@ -45,6 +32,7 @@
           <button id="clear-btn" class="btn btn-secondary">
             Clear All Data
           </button>
+          <button id="share-btn" class="btn btn-secondary">Share Link</button>
           <button id="export-btn" class="btn btn-secondary">Export Data</button>
         </section>
       </main>

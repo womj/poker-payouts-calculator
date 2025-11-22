@@ -4,7 +4,10 @@ const STORAGE_KEY = 'poker-calculator-data';
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
-  loadFromStorage();
+  const loadedFromURL = loadFromURL();
+  if (!loadedFromURL) {
+    loadFromStorage();
+  }
   renderPlayers();
   setupEventListeners();
 });
@@ -15,6 +18,27 @@ function setupEventListeners() {
   document.getElementById('calculate-btn').addEventListener('click', calculatePayouts);
   document.getElementById('clear-btn').addEventListener('click', clearAllData);
   document.getElementById('export-btn').addEventListener('click', exportData);
+  document.getElementById('share-btn').addEventListener('click', shareLink);
+}
+
+// Load data from URL hash if present
+function loadFromURL() {
+  const hash = window.location.hash.substring(1);
+  if (hash) {
+    try {
+      const decoded = decodeURIComponent(hash);
+      const data = JSON.parse(atob(decoded));
+      if (Array.isArray(data) && data.length > 0) {
+        players = data;
+        // Clear the hash after loading to avoid re-loading on refresh
+        history.replaceState(null, null, window.location.pathname);
+        return true;
+      }
+    } catch (error) {
+      console.error('Error loading from URL:', error);
+    }
+  }
+  return false;
 }
 
 // Load data from localStorage
@@ -303,57 +327,59 @@ function renderResults(results, isDampened, dampeningType, dampeningFactor, exce
 
   let html = '';
 
-  // Add info box if dampening was applied
-  if (isDampened) {
-    const dampeningPercentage = (dampeningFactor * 100).toFixed(1);
-    if (dampeningType === 'winners') {
-      html += `
-                <div class="info-box">
-                    <strong>⚖️ Proportional Dampening Applied (Winners)</strong><br>
-                    Original total wins: $${originalTotalWins.toFixed(2)}<br>
-                    Original total losses: $${originalTotalLosses.toFixed(2)}<br>
-                    Excess wins: $${excessAmount.toFixed(2)}<br>
-                    Dampening factor: ${dampeningPercentage}% (${dampeningFactor.toFixed(4)})<br>
-                    Winners' gains have been reduced proportionally to match available funds.
-                </div>
-            `;
-    } else if (dampeningType === 'losers') {
-      html += `
-                <div class="info-box">
-                    <strong>⚖️ Proportional Dampening Applied (Losers)</strong><br>
-                    Original total wins: $${originalTotalWins.toFixed(2)}<br>
-                    Original total losses: $${originalTotalLosses.toFixed(2)}<br>
-                    Excess losses: $${excessAmount.toFixed(2)}<br>
-                    Dampening factor: ${dampeningPercentage}% (${dampeningFactor.toFixed(4)})<br>
-                    Losers' losses have been reduced proportionally to match available funds.
-                </div>
-            `;
-    }
-  }
-
-  // Check for imbalance
-  if (difference > 0.01 && !isDampened) {
-    html += `
-            <div class="info-box">
-                <strong>⚠️ Imbalance Detected</strong><br>
-                Total wins ($${adjustedTotalWins.toFixed(2)}) and losses ($${adjustedTotalLosses.toFixed(2)}) 
-                don't match. Difference: $${difference.toFixed(2)}
-            </div>
-        `;
-  }
-
   // Show payment transactions
   if (transactions.length > 0) {
     html += transactions.map(t => `
             <div class="transaction-item">
-                <div class="transaction-text">
-                    <strong>${t.from}</strong> pays <strong>${t.to}</strong>
-                </div>
-                <div class="transaction-amount">$${t.amount.toFixed(2)}</div>
+                ${t.from} pays ${t.to} $${t.amount.toFixed(2)}
             </div>
         `).join('');
+
+    // Add methodology section
+    html += '<div class="methodology">';
+    html += '<h3>Methodology</h3>';
+
+    if (isDampened) {
+      const dampeningPercentage = (dampeningFactor * 100).toFixed(1);
+      if (dampeningType === 'winners') {
+        html += `
+          <p>Proportional dampening applied to winners:</p>
+          <ul>
+            <li>Original total wins: $${originalTotalWins.toFixed(2)}</li>
+            <li>Original total losses: $${originalTotalLosses.toFixed(2)}</li>
+            <li>Excess wins: $${excessAmount.toFixed(2)}</li>
+            <li>Dampening factor: ${dampeningPercentage}% (${dampeningFactor.toFixed(4)})</li>
+          </ul>
+          <p>Winners' gains reduced proportionally to match available funds.</p>
+        `;
+      } else if (dampeningType === 'losers') {
+        html += `
+          <p>Proportional dampening applied to losers:</p>
+          <ul>
+            <li>Original total wins: $${originalTotalWins.toFixed(2)}</li>
+            <li>Original total losses: $${originalTotalLosses.toFixed(2)}</li>
+            <li>Excess losses: $${excessAmount.toFixed(2)}</li>
+            <li>Dampening factor: ${dampeningPercentage}% (${dampeningFactor.toFixed(4)})</li>
+          </ul>
+          <p>Losers' losses reduced proportionally to match available funds.</p>
+        `;
+      }
+    } else if (difference > 0.01) {
+      html += `
+        <p>Imbalance detected:</p>
+        <ul>
+          <li>Total wins: $${adjustedTotalWins.toFixed(2)}</li>
+          <li>Total losses: $${adjustedTotalLosses.toFixed(2)}</li>
+          <li>Difference: $${difference.toFixed(2)}</li>
+        </ul>
+      `;
+    } else {
+      html += '<p>Transactions calculated using greedy settlement algorithm to minimize number of payments.</p>';
+    }
+
+    html += '</div>';
   } else {
-    html += '<div class="empty-state">All players are even!</div>';
+    html += '<div class="empty-state">All players are even</div>';
   }
 
   resultsDiv.innerHTML = html;
@@ -382,6 +408,30 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
+// Share link with encoded data
+function shareLink() {
+  try {
+    const encoded = btoa(JSON.stringify(players));
+    const shareUrl = `${window.location.origin}${window.location.pathname}#${encodeURIComponent(encoded)}`;
+
+    // Try to copy to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert('Share link copied to clipboard!');
+      }).catch(() => {
+        // Fallback: show the link
+        prompt('Copy this link to share:', shareUrl);
+      });
+    } else {
+      // Fallback for older browsers
+      prompt('Copy this link to share:', shareUrl);
+    }
+  } catch (error) {
+    console.error('Error creating share link:', error);
+    alert('Error creating share link');
+  }
+}
+
 // Make functions available globally
 window.addPlayer = addPlayer;
 window.removePlayer = removePlayer;
@@ -389,3 +439,4 @@ window.updatePlayer = updatePlayer;
 window.calculatePayouts = calculatePayouts;
 window.clearAllData = clearAllData;
 window.exportData = exportData;
+window.shareLink = shareLink;
