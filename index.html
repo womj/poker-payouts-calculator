@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Poker Cash Game Payouts Calculator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>💰 Poker Payouts Calculator</h1>
+        <p class="subtitle">
+          Track buy-ins and cash-outs to calculate settlements
+        </p>
+      </header>
+
+      <main>
+        <section class="input-section">
+          <h2>Players</h2>
+          <div class="column-headers">
+            <div>Name</div>
+            <div>Buy-in ($)</div>
+            <div>Cash-out ($)</div>
+            <div>Delta ($)</div>
+            <div></div>
+          </div>
+          <div id="players-list" class="players-list"></div>
+          <button id="add-player-btn" class="btn btn-primary">
+            + Add Player
+          </button>
+        </section>
+
+        <section class="results-section">
+          <div class="results-header">
+            <h2>Payment Instructions</h2>
+            <button id="calculate-btn" class="btn btn-success">
+              Calculate Payouts
+            </button>
+          </div>
+          <div id="results"></div>
+        </section>
+
+        <section class="actions-section">
+          <button id="clear-btn" class="btn btn-secondary">
+            Clear All Data
+          </button>
+          <button id="export-btn" class="btn btn-secondary">Export Data</button>
+        </section>
+      </main>
+
+      <footer>
+        <p>Data is saved automatically in your browser</p>
+      </footer>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
