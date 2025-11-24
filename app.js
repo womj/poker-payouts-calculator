@@ -150,7 +150,7 @@ function renderPlayers() {
                 class="player-input player-number-input"
                 id="buyin-${player.id}" 
                 value="${player.buyIn || ''}"
-                placeholder="0"
+                placeholder=""
                 step="0.01"
                 onchange="updatePlayer(${player.id}, 'buyIn', this.value)"
             />
@@ -159,7 +159,7 @@ function renderPlayers() {
                 class="player-input player-number-input"
                 id="cashout-${player.id}" 
                 value="${player.cashOut || ''}"
-                placeholder="0"
+                placeholder=""
                 step="0.01"
                 onchange="updatePlayer(${player.id}, 'cashOut', this.value)"
             />
@@ -168,7 +168,7 @@ function renderPlayers() {
                 class="player-input player-number-input ${deltaClass}"
                 id="delta-${player.id}" 
                 value="${delta || ''}"
-                placeholder="0"
+                placeholder=""
                 step="0.01"
                 onchange="updatePlayer(${player.id}, 'delta', this.value)"
             />

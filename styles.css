@@ -118,6 +118,18 @@ section {
   text-align: right;
 }
 
+/* Remove spinner arrows from number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .remove-player-btn-compact {
   background: var(--danger-color);
   color: white;
@@ -165,19 +177,19 @@ section {
 
 .delta-positive {
   background: rgba(34, 197, 94, 0.15) !important;
-  color: var(--success-color) !important;
+  color: #15803d !important;
   font-weight: 600;
 }
 
 .delta-negative {
   background: rgba(239, 68, 68, 0.15) !important;
-  color: var(--danger-color) !important;
+  color: #b91c1c !important;
   font-weight: 600;
 }
 
 .delta-zero {
-  background: var(--card-background) !important;
-  color: var(--text-primary) !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
 }
 
 /* Player Cards - Legacy (remove if not needed) */
